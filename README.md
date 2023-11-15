@@ -31,20 +31,133 @@ The RBF of hidden neuron as gaussian function
 
 
 ## ALGORIHM:
+STEP 1: Import the necessary libraries of python.
 
-/** Write the Algorithm in steps**/
+STEP 2: In the function of end_to_end, calculate the similarity between the inputs and the peaks. Then, using the equation Aw = Y in matrix form. Each row of A consists of (shape: (4, 2)).
+
+STEP 3: In index[0] of the matrix there is a similarity of a point with peak1. In index[1] of the matrix there is a similarity of another point with peak2. In index[2] of the matrix the Bias input is given (1).
+
+STEP 4: Y is the output associated with the input of (shape: (4, )). W is calculated using the same equation we use to solve the linear regression using a closed solution ((i.e) normal equation).
+
+STEP 5: This neural network is constructed using the architecture of 2-2-1;
+
+where;
+
+2 nodes of input neurons (x1, x2) used in input layer, 2 node of neurons (each for one peak) used in hidden layer, and 1 neuron used in output layer.
+
+STEP 6: The last step is to find the weights for the edges to the 1-output unit. Weights associated would be:
+
+edge joining 1st node (peak1-output) to the output node, edge joining 2nd node (peak2-output) to the output node and the bias edge.
+
+STEP 7: End the program.
 
 ## PROGRAM:
+```
+Developed by: SUJITHRA B K N
+Reg no: 212222230153
+```
+```
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow.keras.initializers import Initializer
+from tensorflow.keras.layers import Layer
+from tensorflow.keras.initializers import RandomUniform, Initializer, Constant
+
+def gaussian_rbf(x, landmark, gamma=1):
+    return np.exp(-gamma * np.linalg.norm(x - landmark)**2)
+    
+    def end_to_end(X1, X2, ys, mu1, mu2):
+    from_1 = [gaussian_rbf(i, mu1) for i in zip(X1, X2)]
+    from_2 = [gaussian_rbf(i, mu2) for i in zip(X1, X2)]
+    # plot
+    
+    plt.figure(figsize=(13, 5))
+    plt.subplot(1, 2, 1)
+    plt.scatter((x1[0], x1[3]), (x2[0], x2[3]), label="Class_0")
+    plt.scatter((x1[1], x1[2]), (x2[1], x2[2]), label="Class_1")
+    plt.xlabel("$X1$", fontsize=15)
+    plt.ylabel("$X2$", fontsize=15)
+    plt.title("Xor: Linearly Inseparable", fontsize=15)
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.scatter(from_1[0], from_2[0], label="Class_0")
+    plt.scatter(from_1[1], from_2[1], label="Class_1")
+    plt.scatter(from_1[2], from_2[2], label="Class_1")
+    plt.scatter(from_1[3], from_2[3], label="Class_0")
+    plt.plot([0, 0.95], [0.95, 0], "k--")
+    plt.annotate("Seperating hyperplane", xy=(0.4, 0.55), xytext=(0.55, 0.66),
+                arrowprops=dict(facecolor='black', shrink=0.05))
+    plt.xlabel(f"$mu1$: {(mu1)}", fontsize=15)
+    plt.ylabel(f"$mu2$: {(mu2)}", fontsize=15)
+    plt.title("Transformed Inputs: Linearly Seperable", fontsize=15)
+    plt.legend()
+
+    A = []
+
+    for i, j in zip(from_1, from_2):
+        temp = []
+        temp.append(i)
+        temp.append(j)
+        temp.append(1)
+        A.append(temp)
+    
+    A = np.array(A)
+    W = np.linalg.inv(A.T.dot(A)).dot(A.T).dot(ys)
+    print(np.round(A.dot(W)))
+    print(ys)
+    print(f"Weights: {W}")
+    return W
+    
+    def predict_matrix(point, weights):
+    gaussian_rbf_0 = gaussian_rbf(np.array(point), mu1)
+    gaussian_rbf_1 = gaussian_rbf(np.array(point), mu2)
+    A = np.array([gaussian_rbf_0, gaussian_rbf_1, 1])
+    return np.round(A.dot(weights))
+    
+    x1 = np.array([0, 0, 1, 1])
+x2 = np.array([0, 1, 0, 1])
+ys = np.array([0, 1, 1, 0])
+
+# centers
+mu1 = np.array([0, 1])
+mu2 = np.array([1, 0])
+
+w = end_to_end(x1, x2, ys, mu1, mu2)
+
+# testing
+
+print(f"Input:{np.array([0, 0])}, Predicted: {predict_matrix(np.array([0, 0]), w)}")
+print(f"Input:{np.array([0, 1])}, Predicted: {predict_matrix(np.array([0, 1]), w)}")
+print(f"Input:{np.array([1, 0])}, Predicted: {predict_matrix(np.array([1, 0]), w)}")
+print(f"Input:{np.array([1, 1])}, Predicted: {predict_matrix(np.array([1, 1]), w)}")
+
+mu1 = np.array([0, 0])
+mu2 = np.array([1, 1])
+
+w = end_to_end(x1, x2, ys, mu1, mu2)
+
+# testing
+
+print(f"Input:{np.array([0, 0])}, Predicted: {predict_matrix(np.array([0, 0]), w)}")
+print(f"Input:{np.array([0, 1])}, Predicted: {predict_matrix(np.array([0, 1]), w)}")
+print(f"Input:{np.array([1, 0])}, Predicted: {predict_matrix(np.array([1, 0]), w)}")
+print(f"Input:{np.array([1, 1])}, Predicted: {predict_matrix(np.array([1, 1]), w)}")
+```
 
 
 
 ## OUTPUT :
-    /**PLOTS of Output in hidden space**/
-    /Classification results
+
+![image](https://github.com/sujithrabkn/Experiment-5-Implementation-of-XOR-using-RBF/assets/119477857/98d0dc5b-5784-4049-9fdd-afae261eb067)
+
+![image](https://github.com/sujithrabkn/Experiment-5-Implementation-of-XOR-using-RBF/assets/119477857/109fd3e7-6a4f-44fc-a1f7-3e9aebac16e3)
+
 
 ## RESULT:
 
-
+Implementation-of-XOR-using-RBF is successfully implemented.
 
 
 
